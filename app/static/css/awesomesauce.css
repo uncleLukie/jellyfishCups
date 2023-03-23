@@ -1,0 +1,21 @@
+body {
+  background-color: #dead65;
+  background-image:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.card {
+  background-color: #c79d69; /* Change this color to your desired card background color */
+}
+
+.btn-primary {
+  background-color: #00704A;
+  border-color: #00704A;
+}
+
+.btn-primary:hover {
+  background-color: #005a3a;
+  border-color: #005a3a;
+}

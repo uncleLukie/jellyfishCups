@@ -3,25 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://unpkg.com/tailwindcss@3.2.7/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link href="/static/css/awesomesauce.css" rel="stylesheet">
   <title>jellyfishCups</title>
 </head>
 <body>
-  <div id="app" class="container mx-auto px-4">
-  <h1 class="text-center my-8 text-4xl font-semibold">jellyfishCups</h1>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-    <div v-for="cup in cups" class="bg-white shadow rounded-lg overflow-hidden">
-      <img :src="cup.image_url" class="w-full h-48 object-cover" :alt="cup.name">
-      <div class="p-4">
-        <h5 class="text-lg font-semibold">{{ cup.name }}</h5>
-        <p class="text-gray-600">${{ cup.price }}</p>
-        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-4 rounded mt-4" @click="addToCart(cup)">Add to Cart</button>
+  <div id="app" class="container">
+    <h1 class="text-center my-5">
+      <img src="https://i.imgur.com/9XDy4kJ.png" alt="jellyfishCups" />
+    </h1>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      <div v-for="cup in cups" class="col">
+        <div class="card h-100 shadow-sm">
+          <img :src="cup.image_url" class="card-img-top" :alt="cup.name">
+          <div class="card-body">
+            <h5 class="card-title">{{ cup.name }}</h5>
+            <p class="card-text">${{ cup.price }}</p>
+            <button class="btn btn-primary" @click="addToCart(cup)">Add to Cart</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <!-- Vue.js -->
   <script src="https://unpkg.com/vue@3.2.47"></script>
-  <script src="/static/js/app.js?v=1"></script>
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
