@@ -8,6 +8,14 @@ class Cup(db.Model):
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
 
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "price": self.price,
+            "image_url": self.image_url,
+        }
+
 class Order(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     email = db.Column(db.String(255), nullable=False)

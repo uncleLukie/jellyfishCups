@@ -61,3 +61,8 @@ def checkout():
     mail.send(msg)
 
     return jsonify({"result": "success"})
+
+@app.route("/api/cups")
+def api_cups():
+    cups = Cup.query.all()
+    return jsonify([cup.serialize() for cup in cups])

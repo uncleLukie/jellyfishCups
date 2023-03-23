@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.7/dist/tailwind.min.css" rel="stylesheet">
+  <title>jellyfishCups</title>
+</head>
+<body>
+  <div id="app" class="container mx-auto px-4">
+  <h1 class="text-center my-8 text-4xl font-semibold">JellyfishCups</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div v-for="cup in cups" class="bg-white shadow rounded-lg overflow-hidden">
+      <img :src="cup.image_url" class="w-full h-48 object-cover" :alt="cup.name">
+      <div class="p-4">
+        <h5 class="text-lg font-semibold">[[ cup.name ]]</h5>
+        <p class="text-gray-600">$[[ cup.price ]]</p>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-4 rounded mt-4" @click="addToCart(cup)">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <script src="https://unpkg.com/vue@3.2.47"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

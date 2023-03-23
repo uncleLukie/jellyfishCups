@@ -8,11 +8,13 @@ services:
     volumes:
       - .:/app
     environment:
-      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     env_file:
       - .env
+    depends_on:
+      - db
   db:
-    image: "postgres:13"
+    image: "postgres:15.2"
     ports:
       - "5432:5432"
     environment:
