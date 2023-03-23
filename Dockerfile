@@ -11,6 +11,7 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 # Copy the app folder into the container
 COPY app /app/
 COPY run.py /app/
+COPY dummy_data.py /app/
 COPY db_init.py /app/
 
 # Make port 5000 available to the world outside the container

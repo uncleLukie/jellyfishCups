@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from app import app, db
 from app.models import Cup, Order
 from flask_mail import Mail, Message
@@ -62,7 +62,9 @@ def checkout():
 
     return jsonify({"result": "success"})
 
-@app.route("/api/cups")
-def api_cups():
+@app.route('/api/cups', methods=['GET'])
+def get_cups():
     cups = Cup.query.all()
-    return jsonify([cup.serialize() for cup in cups])
+    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url} for cup in cups]
+
+    return jsonify(cup_data)

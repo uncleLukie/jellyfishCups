@@ -1,0 +1,16 @@
+# take down docker containsers, build them, run them
+docker-compose --env-file .env down
+docker-compose --env-file .env build
+docker-compose --env-file .env up
+
+# lists all docker containers
+docker ps
+
+# init db
+docker exec -it <container_name_or_id> python db_init.py
+
+#put in dummy data
+docker exec -it <container_name_or_id> python dummy_data.py
+
+# see if there are cups in the db
+docker exec -it <container_name_or_id> python print_cups.py
