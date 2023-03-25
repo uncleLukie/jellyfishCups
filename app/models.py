@@ -8,10 +8,9 @@ class Aesthetic(db.Model):
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
-class Text(db.Model):
+class TextColor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.String(50), nullable=False)
-    text_content = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
@@ -28,9 +27,19 @@ class Cup(db.Model):
             "price": self.price,
             "image_url": self.image_url,
         }
+class CustomizedCup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(UUID(as_uuid=True), db.ForeignKey('order.id'), nullable=False)
+    cup_id = db.Column(db.Integer, db.ForeignKey('cup.id'), nullable=False)
+    aesthetic_id = db.Column(db.Integer, db.ForeignKey('aesthetic.id'), nullable=True)
+    text_color_id = db.Column(db.Integer, db.ForeignKey('text_color.id'), nullable=True)
+    text_content = db.Column(db.String(255), nullable=True)
+    cup = db.relationship('Cup')
+    aesthetic = db.relationship('Aesthetic')
+    text_color = db.relationship('TextColor')
 
 class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     ticket_number = db.Column(db.String(100), unique=True, nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -42,9 +51,4 @@ class Order(db.Model):
     state = db.Column(db.String(100), nullable=False)
     postal_code = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(100), nullable=False)
-    cup_id = db.Column(db.Integer, db.ForeignKey('cup.id'), nullable=False)
-    aesthetic_id = db.Column(db.Integer, db.ForeignKey('aesthetic.id'), nullable=False)
-    text_id = db.Column(db.Integer, db.ForeignKey('text.id'), nullable=False)
-    cup = db.relationship('Cup')
-    aesthetic = db.relationship('Aesthetic')
-    text = db.relationship('Text')
+    customized_cups = db.relationship('CustomizedCup', backref='order')
