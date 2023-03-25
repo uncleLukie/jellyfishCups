@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from app import app, db
-from app.models import Cup, Order
+from app.models import Cup, Order, Aesthetic, TextOption
 from flask_mail import Mail, Message
 import json
 import os
@@ -65,6 +65,20 @@ def checkout():
 @app.route('/api/cups', methods=['GET'])
 def get_cups():
     cups = Cup.query.all()
-    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url} for cup in cups]
+    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url, 'aesthetic_id': cup.aesthetic_id, 'text_option_id': cup.text_option_id, 'text_content': cup.text_content} for cup in cups]
 
     return jsonify(cup_data)
+
+@app.route('/api/aesthetics', methods=['GET'])
+def get_aesthetics():
+    aesthetics = Aesthetic.query.all()
+    aesthetic_data = [{'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price} for aesthetic in aesthetics]
+
+    return jsonify(aesthetic_data)
+
+@app.route('/api/text_options', methods=['GET'])
+def get_text_options():
+    text_options = TextOption.query.all()
+    text_option_data = [{'id': text_option.id, 'color': text_option.color, 'price': text_option.price} for text_option in text_options]
+
+    return jsonify(text_option_data)
