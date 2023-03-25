@@ -14,3 +14,9 @@ docker exec -it <container_name_or_id> python dummy_data.py
 
 # see if there are cups in the db
 docker exec -it <container_name_or_id> python print_cups.py
+
+#migrate 
+docker exec -it <container_id_or_name> /bin/bash
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade

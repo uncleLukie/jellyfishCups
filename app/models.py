@@ -6,22 +6,20 @@ class Aesthetic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(255), nullable=False)
 
-class TextOption(db.Model):
+class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    color = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(50), nullable=False)
+    text_content = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(255), nullable=False)
 
-# Add relationships to the Cup model
 class Cup(db.Model):
-    # ...
-    aesthetic_id = db.Column(db.Integer, db.ForeignKey("aesthetic.id"))
-    aesthetic = db.relationship("Aesthetic")
-
-    text_option_id = db.Column(db.Integer, db.ForeignKey("text_option.id"))
-    text_option = db.relationship("TextOption")
-
-    text_content = db.Column(db.String(50), nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(255), nullable=False)
 
     def serialize(self):
         return {
@@ -32,7 +30,21 @@ class Cup(db.Model):
         }
 
 class Order(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    email = db.Column(db.String(255), nullable=False)
-    items = db.Column(db.String, nullable=False)
-    total_price = db.Column(db.Float, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_number = db.Column(db.String(100), unique=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    address_line1 = db.Column(db.String(255), nullable=False)
+    address_line2 = db.Column(db.String(255), nullable=True)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
+    cup_id = db.Column(db.Integer, db.ForeignKey('cup.id'), nullable=False)
+    aesthetic_id = db.Column(db.Integer, db.ForeignKey('aesthetic.id'), nullable=False)
+    text_id = db.Column(db.Integer, db.ForeignKey('text.id'), nullable=False)
+    cup = db.relationship('Cup')
+    aesthetic = db.relationship('Aesthetic')
+    text = db.relationship('Text')

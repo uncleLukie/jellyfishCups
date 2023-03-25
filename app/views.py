@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from app import app, db
-from app.models import Cup, Order, Aesthetic, TextOption
+from app.models import Cup, Order, Aesthetic, Text
 from flask_mail import Mail, Message
 import json
 import os
