@@ -20,6 +20,7 @@ class Cup(db.Model):
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
     customizable = db.Column(db.Boolean, nullable=False, default=False)
+    stock = db.Column(db.Integer, nullable=False)
 
     def serialize(self):
         return {
