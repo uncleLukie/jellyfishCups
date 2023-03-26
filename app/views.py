@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from app import app, db
-from app.models import Cup, Order, Aesthetic, Text
+from app.models import Cup, Order, Aesthetic, TextColor
 from flask_mail import Mail, Message
 import json
 import os
@@ -20,25 +20,6 @@ mail = Mail(app)
 def index():
     cups = Cup.query.all()
     return render_template("index.html", cups=cups)
-
-@app.route("/add_cup", methods=["POST"])
-def add_cup():
-    # Add cup details from the form
-    name = request.form["name"]
-    price = request.form["price"]
-    image_url = request.form["image_url"]
-
-    cup = Cup(name=name, price=price, image_url=image_url)
-    db.session.add(cup)
-    db.session.commit()
-    return redirect(url_for("index"))
-
-@app.route("/remove_cup/<uuid:cup_id>", methods=["POST"])
-def remove_cup(cup_id):
-    cup = Cup.query.get(cup_id)
-    db.session.delete(cup)
-    db.session.commit()
-    return redirect(url_for("index"))
 
 @app.route("/checkout", methods=["POST"])
 def checkout():
@@ -65,20 +46,20 @@ def checkout():
 @app.route('/api/cups', methods=['GET'])
 def get_cups():
     cups = Cup.query.all()
-    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url, 'aesthetic_id': cup.aesthetic_id, 'text_option_id': cup.text_option_id, 'text_content': cup.text_content} for cup in cups]
+    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url} for cup in cups]
 
-    return jsonify(cup_data)
+    return jsonify({"cups": cup_data})
 
 @app.route('/api/aesthetics', methods=['GET'])
 def get_aesthetics():
     aesthetics = Aesthetic.query.all()
-    aesthetic_data = [{'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price} for aesthetic in aesthetics]
+    aesthetic_data = [{'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price, 'image_url': aesthetic.image_url} for aesthetic in aesthetics]
 
-    return jsonify(aesthetic_data)
+    return jsonify({"aesthetics": aesthetic_data})
 
-@app.route('/api/text_options', methods=['GET'])
-def get_text_options():
-    text_options = TextOption.query.all()
-    text_option_data = [{'id': text_option.id, 'color': text_option.color, 'price': text_option.price} for text_option in text_options]
+@app.route('/api/text_colors', methods=['GET'])
+def get_text_colors():
+    text_colors = TextColor.query.all()
+    text_color_data = [{'id': text_color.id, 'color': text_color.color, 'price': text_color.price, 'image_url': text_color.image_url} for text_color in text_colors]
 
-    return jsonify(text_option_data)
+    return jsonify({"text_colors": text_color_data})

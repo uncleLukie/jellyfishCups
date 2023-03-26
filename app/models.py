@@ -1,5 +1,5 @@
 from app import db
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
 
 class Aesthetic(db.Model):
@@ -19,6 +19,7 @@ class Cup(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
+    customizable = db.Column(db.Boolean, nullable=False, default=False)
 
     def serialize(self):
         return {
@@ -26,17 +27,8 @@ class Cup(db.Model):
             "name": self.name,
             "price": self.price,
             "image_url": self.image_url,
+            "customizable": self.customizable,
         }
-class CustomizedCup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(UUID(as_uuid=True), db.ForeignKey('order.id'), nullable=False)
-    cup_id = db.Column(db.Integer, db.ForeignKey('cup.id'), nullable=False)
-    aesthetic_id = db.Column(db.Integer, db.ForeignKey('aesthetic.id'), nullable=True)
-    text_color_id = db.Column(db.Integer, db.ForeignKey('text_color.id'), nullable=True)
-    text_content = db.Column(db.String(255), nullable=True)
-    cup = db.relationship('Cup')
-    aesthetic = db.relationship('Aesthetic')
-    text_color = db.relationship('TextColor')
 
 class Order(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
@@ -51,4 +43,4 @@ class Order(db.Model):
     state = db.Column(db.String(100), nullable=False)
     postal_code = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(100), nullable=False)
-    customized_cups = db.relationship('CustomizedCup', backref='order')
+    customized_cups_data = db.Column(JSON, nullable=False)
