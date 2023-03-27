@@ -46,10 +46,17 @@ def checkout():
 @app.route('/api/cups', methods=['GET'])
 def get_cups():
     cups = Cup.query.all()
-    cup_data = [{'id': cup.id, 'name': cup.name, 'price': cup.price, 'image_url': cup.image_url} for cup in cups]
-
-    return jsonify({"cups": cup_data})
-
+    cup_list = []
+    for cup in cups:
+        cup_list.append({
+            'id': cup.id,
+            'name': cup.name,
+            'price': cup.price,
+            'image_url': cup.image_url,
+            'customizable': cup.customizable,
+            'stock': cup.stock
+        })
+    return jsonify({'cups': cup_list})
 @app.route('/api/aesthetics', methods=['GET'])
 def get_aesthetics():
     aesthetics = Aesthetic.query.all()

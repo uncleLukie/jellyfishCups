@@ -3,19 +3,19 @@ from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
 
 class Aesthetic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
 class TextColor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     color = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
 class Cup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)

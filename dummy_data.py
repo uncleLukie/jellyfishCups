@@ -6,19 +6,29 @@ dummy_cups = [
         'name': 'Blue Jellyfish Cup',
         'price': 12.99,
         'image_url': 'https://i.etsystatic.com/27537437/r/il/3613b7/3232071911/il_1588xN.3232071911_9l46.jpg',
-        'customizable': True,
+        'customizable': False,
+        'stock': 1
     },
     {
         'name': 'Red Jellyfish Cup',
         'price': 14.98,
         'image_url': 'https://i.etsystatic.com/30374348/r/il/6cadca/3234313411/il_fullxfull.3234313411_kvyw.jpg',
         'customizable': True,
+        'stock': 1
     },
     {
         'name': 'Green Jellyfish Cup',
         'price': 13.99,
         'image_url': 'https://i.etsystatic.com/15619823/r/il/83edd6/3080652390/il_fullxfull.3080652390_c217.jpg',
         'customizable': False,
+        'stock': 1
+    },
+    {
+        'name': 'Normal Starbucks Cup',
+        'price': 9.99,
+        'image_url': 'https://m.media-amazon.com/images/I/511eW0vDTfS._AC_UL960_QL65_.jpg',
+        'customizable': True,
+        'stock': 1
     },
 ]
 
@@ -60,7 +70,7 @@ with app.app_context():
 
     # Insert dummy cups into the database
     for cup_data in dummy_cups:
-        cup = Cup(name=cup_data['name'], price=cup_data['price'], image_url=cup_data['image_url'])
+        cup = Cup(name=cup_data['name'], price=cup_data['price'], image_url=cup_data['image_url'], customizable=cup_data['customizable'], stock=cup_data['stock'])
         db.session.add(cup)
 
     # Insert dummy aesthetics into the database

@@ -1,4 +1,7 @@
 let cups = [];
+let aesthetics = [];
+let text_colors = [];
+let selectedCup = null;
 
 function createCupCard(cup) {
   return `
@@ -25,9 +28,23 @@ function populateCups(cups) {
   }
 }
 
+function fetchAesthetics() {
+  return $.get("/api/aesthetics", function (data) {
+    return data.aesthetics;
+  });
+}
+
+function fetchTextColors() {
+  return $.get("/api/text_colors", function (data) {
+    return data.text_colors;
+  });
+}
+
+
 function fetchCups() {
   return $.get("/api/cups", function (data) {
-    return data.cups;
+    localStorage.setItem("cups", JSON.stringify(data.cups));
+    populateCups(data.cups);
   });
 }
 
@@ -37,21 +54,29 @@ let cart = {
   // Add more properties if needed
 };
 
-function addToCart(cupId) {
-  let cup = getCupById(cupId);
+function addToCart(cupId, customizedCup = null) {
+  let cup = customizedCup ? customizedCup : getCupById(cupId);
+  console.log("Cup:", cup);
 
-  if (cup.customizable) {
-    openCustomizationModal(cup);
+  if (!cup) {
+    return;
+  }
+
+  if (cup.customizable && !customizedCup) {
+    selectedCup = cup;
+    openCustomizationModal();
   } else {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(cup);
     localStorage.setItem("cart", JSON.stringify(cart));
+    populateCart();
   }
 }
 
 function getCupById(cupId) {
   let cups = JSON.parse(localStorage.getItem("cups")) || [];
-  return cups.find(cup => cup.id === cupId);
+  let cup = cups.find(cup => cup.id === cupId);
+  return cup ? {...cup, name: cup.name || ''} : null;
 }
 
 function populateCart() {
@@ -64,7 +89,11 @@ function showCart() {
   let cartItems = "";
 
   cart.forEach((cup) => {
-    cartItems += `<li>${cup.name} - ${cup.aesthetic} - ${cup.text_color} - ${cup.text_content}</li>`;
+    const aestheticText = cup.aesthetic ? cup.aesthetic.name : '';
+    const textColorText = cup.text_color ? cup.text_color.name : '';
+    const textContentText = cup.text_content || '';
+    const customizations = [aestheticText, textColorText, textContentText].filter(Boolean).join(" - ");
+    cartItems += `<li>${cup.name}${customizations ? ' - ' + customizations : ''}</li>`;
   });
 
   $("#cart-items").html(cartItems);
@@ -76,7 +105,7 @@ function handleCheckout() {
   // and redirect the user to the checkout page
 }
 
-function openCustomizationModal(cup) {
+function openCustomizationModal() {
   // Populate aesthetic options
   let aestheticOptions = "";
   aesthetics.forEach((aesthetic) => {
@@ -91,15 +120,21 @@ function openCustomizationModal(cup) {
   });
   $("#text-color-selector").html(textColorOptions);
 
-  // Open the customization modal
-  $("#customizationModal").data("cup", JSON.stringify(cup)).modal("show");
+  $("#customizationModal").modal("show");
 }
 
 $(document).ready(function () {
   fetchCups().done(function (data) {
     let cups = data.cups;
-    populateCups(cups);
-    localStorage.setItem("cups", JSON.stringify(cups)); // Store fetched cups in localStorage
+  });
+
+ // Fetch aesthetics and text colors and store them in global variables
+  fetchAesthetics().done(function (data) {
+    aesthetics = data.aesthetics;
+  });
+
+  fetchTextColors().done(function (data) {
+    text_colors = data.text_colors;
   });
 
   // Event listener for "Add to Cart" buttons
@@ -131,21 +166,24 @@ $(document).ready(function () {
   });
 
   $("#save-customization").on("click", function () {
-  let cup = JSON.parse($("#customizationModal").data("cup"));
-  let selectedAesthetic = $("#aesthetic-selector option:selected");
-  let selectedTextColor = $("#text-color-selector option:selected");
-  let textContent = $("#text-content").val();
+    let cup = selectedCup;
+    let selectedAesthetic = $("#aesthetic-selector option:selected");
+    let selectedTextColor = $("#text-color-selector option:selected");
+    let textContent = $("#text-content").val();
 
-  cup.aesthetic_id = selectedAesthetic.val();
-  cup.aesthetic_name = selectedAesthetic.text();
-  cup.aesthetic_image_url = selectedAesthetic.data("image");
-  cup.text_color_id = selectedTextColor.val();
-  cup.text_color_name = selectedTextColor.text();
-  cup.text_color_image_url = selectedTextColor.data("image");
-  cup.text_content = textContent;
+    cup.aesthetic_id = parseInt(selectedAesthetic.val());
+    cup.aesthetic = {
+      name: selectedAesthetic.text(),
+      image_url: selectedAesthetic.data("image")
+    };
+    cup.text_color_id = parseInt(selectedTextColor.val());
+    cup.text_color = {
+      name: selectedTextColor.text(),
+      image_url: selectedTextColor.data("image")
+    };
+    cup.text_content = textContent;
 
-  addToCart(cup);
-    $("#customizationModal").modal("hide");
-  });
-
+    addToCart(cup.id, cup);
+    $("#customizationModal").modal("hide")
+    });
 });
