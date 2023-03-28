@@ -29,24 +29,32 @@
   </div>
 
   <!-- Cart Modal -->
-  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ul id="cart-items"></ul>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button id="clear-cart-button" class="btn btn-danger">Clear Cart</button>
-          <button id="checkout-button" class="btn btn-success">Checkout</button>
+     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul id="cart-items"></ul>
+          </div>
+          <div class="modal-footer">
+              <div class="text-start">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="clear-cart-button" class="btn btn-danger">Clear Cart</button>
+              </div>
+              <div class="text-end d-flex align-items-center">
+                <div>
+                  <strong>Total: </strong>
+                  <strong id="cart-total"></strong>
+                </div>
+                <button id="checkout-button" class="btn btn-success ms-3">Checkout</button>
+              </div>
+            </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
   <!-- Customization Modal -->
 <div class="modal fade" id="customizationModal" tabindex="-1" role="dialog" aria-labelledby="customizationModalLabel" aria-hidden="true">
