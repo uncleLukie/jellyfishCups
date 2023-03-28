@@ -133,6 +133,13 @@ $(document).ready(function () {
     aesthetics = data.aesthetics;
   });
 
+  function clearCart() {
+  localStorage.removeItem("cart");
+  populateCart();
+   $("#cartModal").modal("hide");
+  }
+
+
   fetchTextColors().done(function (data) {
     text_colors = data.text_colors;
   });
@@ -186,4 +193,9 @@ $(document).ready(function () {
     addToCart(cup.id, cup);
     $("#customizationModal").modal("hide")
     });
+
+    $("#clear-cart-button").on("click", function () {
+    clearCart();
+    });
+    populateCart();
 });

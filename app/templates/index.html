@@ -26,9 +26,6 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="cups-container">
       <!-- Cups will be populated here using jQuery -->
     </div>
-    <div class="text-center mb-5">
-      <button class="btn btn-lg btn-success" id="checkout-button">Checkout</button>
-    </div>
   </div>
 
   <!-- Cart Modal -->
@@ -43,7 +40,9 @@
         <ul id="cart-items"></ul>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button id="clear-cart-button" class="btn btn-danger">Clear Cart</button>
+          <button id="checkout-button" class="btn btn-success">Checkout</button>
       </div>
     </div>
   </div>
