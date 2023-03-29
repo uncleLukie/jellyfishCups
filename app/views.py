@@ -12,14 +12,17 @@ app.config.update(
     MAIL_USE_TLS=True,
     MAIL_USERNAME=os.environ.get("MAIL_USERNAME", "username"),
     MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", "password"),
+
 )
 
 mail = Mail(app)
+
 
 @app.route("/")
 def index():
     cups = Cup.query.all()
     return render_template("index.html", cups=cups)
+
 
 @app.route("/checkout", methods=["POST"])
 def checkout():
@@ -43,6 +46,7 @@ def checkout():
 
     return jsonify({"result": "success"})
 
+
 @app.route('/api/cups', methods=['GET'])
 def get_cups():
     cups = Cup.query.all()
@@ -57,16 +61,23 @@ def get_cups():
             'stock': cup.stock
         })
     return jsonify({'cups': cup_list})
+
+
 @app.route('/api/aesthetics', methods=['GET'])
 def get_aesthetics():
     aesthetics = Aesthetic.query.all()
-    aesthetic_data = [{'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price, 'image_url': aesthetic.image_url} for aesthetic in aesthetics]
+    aesthetic_data = [
+        {'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price, 'image_url': aesthetic.image_url} for
+        aesthetic in aesthetics]
 
     return jsonify({"aesthetics": aesthetic_data})
+
 
 @app.route('/api/text_colors', methods=['GET'])
 def get_text_colors():
     text_colors = TextColor.query.all()
-    text_color_data = [{'id': text_color.id, 'color': text_color.color, 'price': text_color.price, 'image_url': text_color.image_url} for text_color in text_colors]
+    text_color_data = [
+        {'id': text_color.id, 'color': text_color.color, 'price': text_color.price, 'image_url': text_color.image_url}
+        for text_color in text_colors]
 
     return jsonify({"text_colors": text_color_data})
