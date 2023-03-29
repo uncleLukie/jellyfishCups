@@ -8,6 +8,7 @@ class Aesthetic(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
+    stock = db.Column(db.Integer, nullable=False, default=0)
 
 
 class TextColor(db.Model):
@@ -15,6 +16,7 @@ class TextColor(db.Model):
     color = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
+    stock = db.Column(db.Integer, nullable=False, default=0)
 
 
 class Cup(db.Model):
@@ -23,7 +25,7 @@ class Cup(db.Model):
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
     customizable = db.Column(db.Boolean, nullable=False, default=False)
-    stock = db.Column(db.Integer, nullable=False)
+    stock = db.Column(db.Integer, nullable=False, default=0)
 
     def serialize(self):
         return {

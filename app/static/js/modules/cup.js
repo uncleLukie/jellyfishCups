@@ -25,8 +25,10 @@ function createCupCard(cup) {
 function populateCups(cups) {
     for (let i = 0; i < cups.length; i++) {
         let cup = cups[i];
-        let cupCard = createCupCard(cup);
-        $("#cups-container").append(cupCard);
+        if (cup.stock > 0) {
+            let cupCard = createCupCard(cup);
+            $("#cups-container").append(cupCard);
+        }
     }
 }
 
@@ -56,16 +58,22 @@ function fetchTextColors() {
 }
 
 function openCustomizationModal(aesthetics, text_colors) {
+    // Filter aesthetics to only include those with stock greater than 0
+    const availableAesthetics = aesthetics.filter(aesthetic => aesthetic.stock > 0);
+
     // Populate aesthetic options
     let aestheticOptions = "";
-    aesthetics.forEach((aesthetic) => {
+    availableAesthetics.forEach((aesthetic) => {
         aestheticOptions += `<option value="${aesthetic.id}" data-image="${aesthetic.image_url}" data-price="${aesthetic.price}">${aesthetic.name} (${aesthetic.price.toFixed(2)})</option>`;
     });
     $("#aesthetic-selector").html(aestheticOptions);
 
+    // Filter text colors to only include those with stock greater than 0
+    const availableTextColors = text_colors.filter(text_color => text_color.stock > 0);
+
     // Populate text color options
     let textColorOptions = "";
-    text_colors.forEach((text_color) => {
+    availableTextColors.forEach((text_color) => {
         textColorOptions += `<option value="${text_color.id}" data-image="${text_color.image_url}" data-price="${text_color.price}">${text_color.color} (${text_color.price.toFixed(2)})</option>`;
     });
     $("#text-color-selector").html(textColorOptions);

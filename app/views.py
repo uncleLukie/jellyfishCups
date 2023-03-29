@@ -67,8 +67,8 @@ def get_cups():
 def get_aesthetics():
     aesthetics = Aesthetic.query.all()
     aesthetic_data = [
-        {'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price, 'image_url': aesthetic.image_url} for
-        aesthetic in aesthetics]
+        {'id': aesthetic.id, 'name': aesthetic.name, 'price': aesthetic.price, 'image_url': aesthetic.image_url,
+         'stock': aesthetic.stock} for aesthetic in aesthetics]
 
     return jsonify({"aesthetics": aesthetic_data})
 
@@ -77,7 +77,7 @@ def get_aesthetics():
 def get_text_colors():
     text_colors = TextColor.query.all()
     text_color_data = [
-        {'id': text_color.id, 'color': text_color.color, 'price': text_color.price, 'image_url': text_color.image_url}
-        for text_color in text_colors]
+        {'id': text_color.id, 'color': text_color.color, 'price': text_color.price, 'image_url': text_color.image_url,
+         'stock': text_color.stock} for text_color in text_colors]
 
     return jsonify({"text_colors": text_color_data})

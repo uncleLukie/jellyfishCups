@@ -1,4 +1,5 @@
 import {getCupById} from './cup.js';
+import {handleCheckout} from "./checkout.js";
 
 export {addToCart, populateCart, showCart, clearCart};
 
@@ -85,4 +86,8 @@ function clearCart() {
     localStorage.removeItem("cart");
     populateCart();
     $("#cartModal").modal("hide");
+}
+
+function checkOut() {
+    handleCheckout();
 }
