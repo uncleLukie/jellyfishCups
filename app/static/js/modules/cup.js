@@ -59,7 +59,17 @@ function fetchTextColors() {
 
 function openCustomizationModal(aesthetics, text_colors) {
     // Filter aesthetics to only include those with stock greater than 0
-    const availableAesthetics = aesthetics.filter(aesthetic => aesthetic.stock > 0);
+    const availableAesthetics = aesthetics.filter((aesthetic) => {
+        return aesthetic.stock > 0;
+    });
+
+    // Add None option to aesthetics
+    availableAesthetics.unshift({
+        id: null,
+        name: "None",
+        image_url: null,
+        price: 0,
+    });
 
     // Populate aesthetic options
     let aestheticOptions = "";
@@ -69,7 +79,17 @@ function openCustomizationModal(aesthetics, text_colors) {
     $("#aesthetic-selector").html(aestheticOptions);
 
     // Filter text colors to only include those with stock greater than 0
-    const availableTextColors = text_colors.filter(text_color => text_color.stock > 0);
+    const availableTextColors = text_colors.filter((text_color) => {
+        return text_color.stock > 0;
+    });
+
+    // Add None option to text colors
+    availableTextColors.unshift({
+        id: null,
+        color: "None",
+        image_url: null,
+        price: 0,
+    });
 
     // Populate text color options
     let textColorOptions = "";
@@ -77,6 +97,25 @@ function openCustomizationModal(aesthetics, text_colors) {
         textColorOptions += `<option value="${text_color.id}" data-image="${text_color.image_url}" data-price="${text_color.price}">${text_color.color} (${text_color.price.toFixed(2)})</option>`;
     });
     $("#text-color-selector").html(textColorOptions);
+
+    // Show/hide text content input field based on selected text color
+    let $textColorSelector = $("#text-color-selector");
+    let $textContentWrapper = $("#text-content-wrapper");
+    let $textContent = $("#text-content");
+
+    $textColorSelector.on("change", function () {
+        let selectedOption = $(this).find("option:selected");
+        let selectedTextColor = parseInt(selectedOption.val());
+        if (selectedTextColor === null || isNaN(selectedTextColor)) {
+            $textContentWrapper.hide();
+            $textContent.val("");
+        } else {
+            $textContentWrapper.show();
+        }
+    });
+
+    // Hide text content input field by default
+    $textContentWrapper.hide();
 
     $("#customizationModal").modal("show");
 }

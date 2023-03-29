@@ -43,10 +43,16 @@ $(document).ready(function () {
         $("#aesthetic-preview").attr("src", imageUrl).show();
     });
 
+    let $textContentWrapper = $("#text-content-wrapper");
+    // Event listener for text-color-selector
     $textColorSelector.on("change", function () {
-        let selectedTextColor = $(this).find("option:selected");
-        let imageUrl = selectedTextColor.data("image");
-        $("#text-color-preview").attr("src", imageUrl).show();
+        let selectedOption = $(this).find("option:selected");
+        let selectedTextColor = parseInt(selectedOption.val());
+        if (selectedTextColor === null) {
+            $textContentWrapper.hide();
+        } else {
+            $textContentWrapper.show();
+        }
     });
 
 
