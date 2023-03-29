@@ -1,7 +1,7 @@
 import {getCupById} from './cup.js';
 import {handleCheckout} from "./checkout.js";
 
-export {addToCart, populateCart, showCart, clearCart};
+export {addToCart, populateCart, showCart, clearCart, bindCartEventHandlers, bindClearCartEventHandlers};
 
 function addToCart(cupId, customizedCup = null) {
     let cup = customizedCup ? customizedCup : getCupById(cupId);
@@ -86,6 +86,62 @@ function clearCart() {
     localStorage.removeItem("cart");
     populateCart();
     $("#cartModal").modal("hide");
+}
+
+function bindCartEventHandlers() {
+    let $cartItems = $("#cart-items");
+
+    $cartItems
+        .on("click", ".plus", function () {
+            let index = $(this).closest("li").index();
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart[index].quantity++;
+            localStorage.setItem("cart", JSON.stringify(cart));
+            showCart();
+        })
+
+        .on("click", ".minus", function () {
+            let index = $(this).closest("li").index();
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart[index].quantity--;
+
+            if (cart[index].quantity === 0) {
+                cart.splice(index, 1);
+            }
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+            showCart();
+
+        })
+
+        .on("click", ".update-quantity", function () {
+            let cupId = $(this).data("cup-id");
+            let action = $(this).data("action");
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let existingCartItem = cart.find((item) => item.id === cupId && !item.customized);
+
+            if (existingCartItem) {
+                if (action === "increment") {
+                    existingCartItem.quantity++;
+                } else if (action === "decrement") {
+                    existingCartItem.quantity--;
+                    if (existingCartItem.quantity <= 0) {
+                        cart = cart.filter((item) => !(item.id === cupId && !item.customized));
+                    }
+                }
+
+                localStorage.setItem("cart", JSON.stringify(cart));
+                populateCart();
+                showCart();
+            }
+        });
+
+}
+
+function bindClearCartEventHandlers() {
+    $("#clear-cart-button").on("click", function () {
+        clearCart();
+    });
 }
 
 function checkOut() {

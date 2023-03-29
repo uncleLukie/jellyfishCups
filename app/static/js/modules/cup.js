@@ -1,6 +1,6 @@
 export {
     fetchCups, getCupById, openCustomizationModal,
-    populateCups, fetchTextColors, fetchAesthetics, cups
+    populateCups, fetchTextColors, fetchAesthetics, cups, saveCustomization
 };
 
 let cups = [];
@@ -78,6 +78,16 @@ function openCustomizationModal(aesthetics, text_colors) {
     });
     $("#aesthetic-selector").html(aestheticOptions);
 
+    $("#aesthetic-selector").on("change", function () {
+        let selectedAesthetic = $(this).find("option:selected");
+        let imageUrl = selectedAesthetic.data("image");
+        if (imageUrl) {
+            $("#aesthetic-preview").attr("src", imageUrl).show();
+        } else {
+            $("#aesthetic-preview").hide();
+        }
+    });
+
     // Filter text colors to only include those with stock greater than 0
     const availableTextColors = text_colors.filter((text_color) => {
         return text_color.stock > 0;
@@ -103,12 +113,18 @@ function openCustomizationModal(aesthetics, text_colors) {
     let $textContentWrapper = $("#text-content-wrapper");
     let $textContent = $("#text-content");
 
-    $textColorSelector.on("change", function () {
-        let selectedOption = $(this).find("option:selected");
-        let selectedTextColor = parseInt(selectedOption.val());
-        if (selectedTextColor === null || isNaN(selectedTextColor)) {
+    $("#text-color-selector").on("change", function () {
+        let selectedTextColor = $(this).find("option:selected");
+        let imageUrl = selectedTextColor.data("image");
+        if (imageUrl) {
+            $("#text-color-preview").attr("src", imageUrl).show();
+        } else {
+            $("#text-color-preview").hide();
+        }
+
+        // Compare the value of the selected option with null
+        if (selectedTextColor.val() === null || isNaN(parseInt(selectedTextColor.val()))) {
             $textContentWrapper.hide();
-            $textContent.val("");
         } else {
             $textContentWrapper.show();
         }
@@ -119,3 +135,30 @@ function openCustomizationModal(aesthetics, text_colors) {
 
     $("#customizationModal").modal("show");
 }
+
+function saveCustomization(selectedCup, selectedAesthetic, selectedTextColor, textContent) {
+    let aestheticPrice = parseFloat(selectedAesthetic.text().match(/\(([^)]+)\)/)[1]);
+    let textColorPrice = parseFloat(selectedTextColor.text().match(/\(([^)]+)\)/)[1]);
+    let totalPrice = selectedCup.price + aestheticPrice + textColorPrice;
+
+    selectedCup.aesthetic_id = parseInt(selectedAesthetic.val());
+    selectedCup.aesthetic = {
+        name: selectedAesthetic.text(),
+        image_url: selectedAesthetic.data("image"),
+        price: aestheticPrice
+    };
+    selectedCup.text_color_id = parseInt(selectedTextColor.val());
+    selectedCup.text_color = {
+        name: selectedTextColor.text(),
+        image_url: selectedTextColor.data("image"),
+        price: textColorPrice
+    };
+    selectedCup.text_content = textContent;
+    selectedCup.total_price = totalPrice;
+
+    return selectedCup;
+}
+
+
+
+
