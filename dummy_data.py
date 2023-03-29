@@ -70,17 +70,20 @@ with app.app_context():
 
     # Insert dummy cups into the database
     for cup_data in dummy_cups:
-        cup = Cup(name=cup_data['name'], price=cup_data['price'], image_url=cup_data['image_url'], customizable=cup_data['customizable'], stock=cup_data['stock'])
+        cup = Cup(name=cup_data['name'], price=cup_data['price'], image_url=cup_data['image_url'],
+                  customizable=cup_data['customizable'], stock=cup_data['stock'])
         db.session.add(cup)
 
     # Insert dummy aesthetics into the database
     for aesthetic_data in dummy_aesthetics:
-        aesthetic = Aesthetic(name=aesthetic_data['name'], price=aesthetic_data['price'], image_url=aesthetic_data['image_url'])
+        aesthetic = Aesthetic(name=aesthetic_data['name'], price=aesthetic_data['price'],
+                              image_url=aesthetic_data['image_url'])
         db.session.add(aesthetic)
 
     # Insert dummy text colors into the database
     for text_color_data in dummy_text_colors:
-        text_color = TextColor(color=text_color_data['color'], price=text_color_data['price'], image_url=text_color_data['image_url'])
+        text_color = TextColor(color=text_color_data['color'], price=text_color_data['price'],
+                               image_url=text_color_data['image_url'])
         db.session.add(text_color)
 
     db.session.commit()

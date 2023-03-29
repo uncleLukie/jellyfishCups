@@ -2,20 +2,23 @@ from app import db
 from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
 
+
 class Aesthetic(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
+
 class TextColor(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     color = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
 
+
 class Cup(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
@@ -30,6 +33,7 @@ class Cup(db.Model):
             "image_url": self.image_url,
             "customizable": self.customizable,
         }
+
 
 class Order(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
