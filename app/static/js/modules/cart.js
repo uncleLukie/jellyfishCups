@@ -6,7 +6,7 @@ export {addToCart, populateCart, showCart, clearCart, bindCartEventHandlers, bin
 function addToCart(cupId, customizedCup = null) {
     let cup = customizedCup ? customizedCup : getCupById(cupId);
 
-    if (!cup) {
+    if (!cup || cup.stock <= 0) {
         return;
     }
 
@@ -27,6 +27,10 @@ function addToCart(cupId, customizedCup = null) {
 
     localStorage.setItem("cart", JSON.stringify(cart));
     populateCart();
+}
+
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
 function populateCart() {
@@ -144,6 +148,123 @@ function bindClearCartEventHandlers() {
     });
 }
 
-function checkOut() {
-    handleCheckout();
+function removeOutOfStockItems(outOfStockItems) {
+    for (const item of outOfStockItems) {
+        const itemIndex = cart.findIndex(cartItem => cartItem.cup_id === item.cup_id);
+        if (itemIndex !== -1) {
+            cart.splice(itemIndex, 1);
+        }
+    }
+    saveCartToLocal();
+    displayCartItems();
+}
+
+async function checkOut() {
+    let items = [];
+
+    // Retrieve the items from the cart
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart.forEach((item) => {
+        const cartItem = {cup_id: item.id, quantity: item.quantity, customizable: item.customizable};
+
+        if (item.customizable) {
+            const aestheticId = item.aesthetic.id;
+            const textColorId = item.text_color.id;
+            cartItem["aesthetic_id"] = aestheticId;
+            cartItem["text_color_id"] = textColorId;
+        }
+
+        items.push(cartItem);
+    });
+
+    // Check if the items are in stock
+    try {
+        const response = await fetch("/check_stock", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({items}),
+        });
+
+        if (response.ok) {
+            const stockResult = await response.json();
+            if (stockResult.result === "in_stock") {
+                // Redirect to the checkout page
+                window.location.href = "/checkout";
+            } else {
+                // Show an error message for out of stock items
+                console.error("Some items are out of stock:", stockResult.out_of_stock_items);
+            }
+        } else {
+            // Show a general error message
+            console.error("An error occurred during the checkout process.");
+        }
+    } catch (error) {
+        // Show an error message for network errors or unexpected issues
+        console.error("An error occurred during the checkout process:", error);
+    }
+}
+
+
+document.getElementById("checkout-button").addEventListener("click", function () {
+    checkOut();
+});
+
+
+function showModalToRemoveOutOfStockItems(outOfStockItems) {
+    // Create the modal structure
+    const modal = document.createElement("div");
+    modal.classList.add("modal", "fade");
+    modal.setAttribute("tabindex", "-1");
+    modal.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Out of Stock Items</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>The following items are out of stock:</p>
+          <ul id="out-of-stock-list" class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="remove-out-of-stock-items">Remove Out of Stock Items</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(modal);
+
+    // Add the out-of-stock items to the list
+    const outOfStockList = modal.querySelector("#out-of-stock-list");
+    outOfStockItems.forEach((item) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("list-group-item");
+        listItem.textContent = `${item.cup_name} - Quantity: ${item.quantity}`;
+        outOfStockList.appendChild(listItem);
+    });
+
+    // Initialize the Bootstrap modal
+    const bsModal = new bootstrap.Modal(modal);
+
+    // Handle the removal of out-of-stock items when the user clicks the "Remove Out of Stock Items" button
+    modal.querySelector("#remove-out-of-stock-items").addEventListener("click", () => {
+        outOfStockItems.forEach((item) => {
+            removeFromCart(item.cup_id);
+        });
+        updateCartDisplay();
+        bsModal.hide();
+    });
+
+    // Remove the modal from the DOM when it's hidden
+    modal.addEventListener("hidden.bs.modal", () => {
+        modal.remove();
+    });
+
+    // Show the modal
+    bsModal.show();
 }

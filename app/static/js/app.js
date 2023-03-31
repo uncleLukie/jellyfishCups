@@ -12,8 +12,6 @@ let text_colors = [];
 let selectedCup = null;
 
 $(document).ready(function () {
-    let $cartItems = $("#cart-items");
-
     // Event listener for "Add to Cart" buttons
     $("#cups-container").on("click", ".add-to-cart", function () {
         let cupId = $(this).data("cup-id");

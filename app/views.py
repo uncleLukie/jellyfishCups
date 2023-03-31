@@ -4,6 +4,13 @@ from app.models import Cup, Order, Aesthetic, TextColor
 from flask_mail import Mail, Message
 import json
 import os
+import paypalrestsdk
+
+paypalrestsdk.configure({
+    "mode": "sandbox",  # sandbox or live
+    "client_id": {os.environ['PAYPAL_CLIENT_ID']},
+    "client_secret": {os.environ["PAYPAL_CLIENT_SECRET"]}
+})
 
 # Configure Flask-Mail
 app.config.update(
@@ -12,7 +19,6 @@ app.config.update(
     MAIL_USE_TLS=True,
     MAIL_USERNAME=os.environ.get("MAIL_USERNAME", "username"),
     MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", "password"),
-
 )
 
 mail = Mail(app)
@@ -24,27 +30,158 @@ def index():
     return render_template("index.html", cups=cups)
 
 
-@app.route("/checkout", methods=["POST"])
+@app.route('/check_stock', methods=['POST'])
+def check_stock():
+    items = request.json.get('items', [])
+    out_of_stock_items = []
+
+    for item in items:
+        cup = Cup.query.get(item['cup_id'])
+
+        if not cup:
+            continue
+
+        customizable = item['customizable'] == "true"
+
+        if customizable:
+            aesthetic = Aesthetic.query.get(item['aesthetic_id'])
+            text_color = TextColor.query.get(item['text_color_id'])
+
+            if cup.stock < item['quantity'] or aesthetic.stock < item['quantity'] or text_color.stock < item[
+                'quantity']:
+                out_of_stock_items.append({
+                    'cup_id': cup.id,
+                    'cup_name': cup.name,
+                    'quantity': item['quantity'],
+                })
+
+        else:
+            if cup.stock < item['quantity']:
+                out_of_stock_items.append({
+                    'cup_id': cup.id,
+                    'cup_name': cup.name,
+                    'quantity': item['quantity'],
+                })
+
+    if out_of_stock_items:
+        return jsonify({'result': 'out_of_stock', 'out_of_stock_items': out_of_stock_items})
+
+    return jsonify({'result': 'in_stock'})
+
+
+@app.route("/checkout", methods=["GET", "POST"])
 def checkout():
-    items = json.loads(request.form["items"])
-    email = request.form["email"]
-    total_price = float(request.form["total_price"])
+    if request.method == "POST":
+        items = json.loads(request.form["items"])
 
-    # Save order to the database
-    order = Order(email=email, items=json.dumps(items), total_price=total_price)
-    db.session.add(order)
-    db.session.commit()
+        # Check stock for cups and their customizations
+        out_of_stock_items = []
+        for item in items:
+            cup = Cup.query.get(item["cup_id"])
 
-    # Send email confirmation
-    msg = Message(
-        "JellyfishCups - Order Confirmation",
-        sender=("JellyfishCups", "noreply@jellyfishcups.com"),
-        recipients=[email],
-    )
-    msg.body = "Your order has been processed successfully!"
-    mail.send(msg)
+            if cup is None:
+                return jsonify({"error": "Cup not found", "cup_id": item["cup_id"]}), 404
 
-    return jsonify({"result": "success"})
+            if cup.stock < item["quantity"]:
+                out_of_stock_items.append(item)
+
+            if item["customizable"]:
+                aesthetic = Aesthetic.query.get(item["aesthetic_id"])
+
+                if aesthetic is None:
+                    return jsonify({"error": "Aesthetic not found", "aesthetic_id": item["aesthetic_id"]}), 404
+
+                text_color = TextColor.query.get(item["text_color_id"])
+
+                if text_color is None:
+                    return jsonify({"error": "Text color not found", "text_color_id": item["text_color_id"]}), 404
+
+                if aesthetic.stock < item["quantity"] or text_color.stock < item["quantity"]:
+                    out_of_stock_items.append(item)
+
+        if out_of_stock_items:
+            return jsonify({"result": "out_of_stock", "out_of_stock_items": out_of_stock_items})
+
+        return render_template("checkout.html", items=items)
+
+    return render_template("checkout.html")
+
+
+@app.route("/process_order", methods=["POST"])
+def process_order():
+    try:
+        items = json.loads(request.form["items"])
+        email = request.form["email"]
+        total_price = float(request.form["total_price"])
+
+        # Create a PayPal payment
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {
+                "payment_method": "paypal"},
+            "redirect_urls": {
+                "return_url": "http://localhost:5000/payment/execute",
+                "cancel_url": "http://localhost:5000/"},
+            "transactions": [{
+                "item_list": {
+                    "items": [{
+                        "name": "JellyfishCups Order",
+                        "sku": "order",
+                        "price": total_price,
+                        "currency": "USD",
+                        "quantity": 1}]},
+                "amount": {
+                    "total": total_price,
+                    "currency": "USD"},
+                "description": "JellyfishCups Order"}]})
+
+        if payment.create():
+            for link in payment.links:
+                if link.rel == "approval_url":
+                    approval_url = link.href
+                    return redirect(approval_url)
+        else:
+            return jsonify({"result": "error", "message": "Error creating PayPal payment."})
+
+    except Exception as e:
+        app.logger.exception(e)
+        return jsonify({"result": "error", "message": str(e)}), 500
+
+
+@app.route("/payment/execute", methods=["GET"])
+def execute_payment():
+    try:
+        payment_id = request.args.get("paymentId")
+        payer_id = request.args.get("PayerID")
+
+        payment = paypalrestsdk.Payment.find(payment_id)
+
+        if payment.execute({"payer_id": payer_id}):
+            # Save order to the database
+            items = json.loads(payment.transactions[0].item_list.items[0].sku)
+            email = payment.payer.payer_info.email
+            total_price = float(payment.transactions[0].amount.total)
+
+            order = Order(email=email, items=json.dumps(items), total_price=total_price)
+            db.session.add(order)
+            db.session.commit()
+
+            # Send email confirmation
+            msg = Message(
+                "JellyfishCups - Order Confirmation",
+                sender=("JellyfishCups", "noreply@jellyfishcups.com"),
+                recipients=[email],
+            )
+            msg.body = "Your order has been processed successfully!"
+            mail.send(msg)
+
+            return render_template("success.html")
+        else:
+            return jsonify({"result": "error", "message": "Error executing PayPal payment."})
+
+    except Exception as e:
+        app.logger.exception(e)
+        return jsonify({"result": "error", "message": str(e)}), 500
 
 
 @app.route('/api/cups', methods=['GET'])
