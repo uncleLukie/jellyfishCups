@@ -36,6 +36,17 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     env_file:
       - .env
+  frontend:
+    build: ./frontend/jellyfish-cups
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/jellyfish-cups:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
