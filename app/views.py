@@ -30,7 +30,7 @@ def index():
     return render_template("index.html", cups=cups)
 
 
-@app.route('/check_stock', methods=['POST'])
+@app.route('/api/check_stock', methods=['POST'])
 def check_stock():
     items = request.json.get('items', [])
     out_of_stock_items = []
@@ -69,7 +69,7 @@ def check_stock():
     return jsonify({'result': 'in_stock'})
 
 
-@app.route("/checkout", methods=["GET", "POST"])
+@app.route("/api/checkout", methods=["GET", "POST"])
 def checkout():
     if request.method == "POST":
         items = json.loads(request.form["items"])
@@ -107,7 +107,7 @@ def checkout():
     return render_template("checkout.html")
 
 
-@app.route("/process_order", methods=["POST"])
+@app.route("/api/process_order", methods=["POST"])
 def process_order():
     try:
         items = json.loads(request.form["items"])
@@ -148,7 +148,7 @@ def process_order():
         return jsonify({"result": "error", "message": str(e)}), 500
 
 
-@app.route("/payment/execute", methods=["GET"])
+@app.route("/api/payment/execute", methods=["GET"])
 def execute_payment():
     try:
         payment_id = request.args.get("paymentId")

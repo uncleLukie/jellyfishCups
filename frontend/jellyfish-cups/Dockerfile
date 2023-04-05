@@ -1,20 +1,20 @@
-# Use the official Node.js LTS image as the base image
-FROM node:lts
+# Use the official Node.js image as a base
+FROM node:14
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json into the working directory
-COPY package*.json ./
+# Copy package.json and yarn.lock files
+COPY package.json yarn.lock ./
 
-# Install the dependencies
-RUN npm ci
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
-# Copy the remaining application files
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port that the app will run on
-EXPOSE 3000
+# Build the React application
+RUN yarn build
 
-# Start the app
-CMD ["npm", "start"]
+# Move the build folder to the desired location
+RUN mv build /app/static
