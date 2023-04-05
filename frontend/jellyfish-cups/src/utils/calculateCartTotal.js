@@ -1,0 +1,1 @@
+// This utility function will calculate the cart total.
